@@ -22,7 +22,7 @@ export async function GET() {
     );
 
     const assets: MarketAsset[] = settled
-      .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof yahooFinance.quote>>> =>
+      .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof yf.quote>>> =>
         r.status === "fulfilled"
       )
       .map((r) => {
