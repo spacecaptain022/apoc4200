@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight, Radio } from "lucide-react";
 import { LiveBadge } from "./LiveBadge";
-import { SignalWindow } from "./SignalWindow";
+import { RotatingSignalWindow } from "./RotatingSignalWindow";
 import { FloatingStatCard } from "./FloatingStatCard";
 import { useMarketStore } from "@/store/market-store";
 import { formatPrice } from "@/lib/formatting/prices";
@@ -155,30 +155,9 @@ export function HeroTransmission() {
             </motion.div>
           </div>
 
-          {/* Right column — signal window */}
-          <div className="flex flex-col gap-3 lg:col-span-5">
-            <SignalWindow label="LIVE SIGNAL FEED" />
-
-            {/* Category tag strip */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.7 }}
-              className="flex flex-wrap gap-2"
-            >
-              {["MARKETS", "CRYPTO", "GEOPOLITICS", "MACRO", "DEGEN"].map((tag) => (
-                <span
-                  key={tag}
-                  className="border px-2 py-0.5 font-data text-[9px] uppercase tracking-[0.12em]"
-                  style={{
-                    borderColor: "var(--border-subtle)",
-                    color: "var(--text-muted)",
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
-            </motion.div>
+          {/* Right column — rotating signal window */}
+          <div className="lg:col-span-5">
+            <RotatingSignalWindow />
           </div>
         </div>
       </div>
