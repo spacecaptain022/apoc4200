@@ -21,6 +21,7 @@ const COIN_IDS = [
   "arbitrum",
   "ripple",
   "sui",
+  "zcash",
 ];
 
 const SYMBOL_MAP: Record<string, string> = {
@@ -34,6 +35,7 @@ const SYMBOL_MAP: Record<string, string> = {
   arbitrum:    "ARB",
   ripple:      "XRP",
   sui:         "SUI",
+  zcash:       "ZEC",
 };
 
 const NAME_MAP: Record<string, string> = {
@@ -47,6 +49,7 @@ const NAME_MAP: Record<string, string> = {
   arbitrum:    "Arbitrum",
   ripple:      "XRP",
   sui:         "Sui",
+  zcash:       "Zcash",
 };
 
 export async function GET() {

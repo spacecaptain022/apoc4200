@@ -14,6 +14,8 @@ function useLiveStatCards() {
   const stocks = useMarketStore((s) => s.stocks);
 
   const btc  = crypto.find((c) => c.symbol === "BTC");
+  const sol  = crypto.find((c) => c.symbol === "SOL");
+  const zec  = crypto.find((c) => c.symbol === "ZEC");
   const spy  = stocks.find((s) => s.symbol === "SPY");
   const vix  = stocks.find((s) => s.symbol === "VIX");
   const nvda = stocks.find((s) => s.symbol === "NVDA");
@@ -24,6 +26,18 @@ function useLiveStatCards() {
       value:  btc?.price ? formatPrice(btc.price) : "—",
       change: btc?.change24h,
       status: (btc?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const),
+    },
+    {
+      label:  "SOL / USD",
+      value:  sol?.price ? formatPrice(sol.price) : "—",
+      change: sol?.change24h,
+      status: (sol?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const),
+    },
+    {
+      label:  "ZEC / USD",
+      value:  zec?.price ? formatPrice(zec.price) : "—",
+      change: zec?.change24h,
+      status: (zec?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const),
     },
     {
       label:  "SPY",
@@ -149,7 +163,7 @@ export function HeroTransmission() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="grid grid-cols-2 gap-2 pt-1 sm:flex sm:flex-wrap"
+              className="grid grid-cols-3 gap-2 pt-1 sm:grid-cols-3 lg:flex lg:flex-wrap"
             >
               {statCards.map((card, i) => (
                 <FloatingStatCard key={card.label} {...card} delay={0.5 + i * 0.08} />
