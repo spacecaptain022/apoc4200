@@ -4,6 +4,7 @@ import { TickerStack } from "@/components/ticker/TickerStack";
 import { StoryRail, MOCK_STORIES } from "@/components/story/StoryRail";
 import { ManifestoBlock } from "@/components/story/ManifestoBlock";
 import { TransmissionBreak } from "@/components/media/TransmissionBreak";
+import { LiveFeedGrid } from "@/components/media/LiveFeedGrid";
 import { AlertSignupForm } from "@/components/forms/AlertSignupForm";
 
 export default function HomePage() {
@@ -20,9 +21,16 @@ export default function HomePage() {
         <StoryRail stories={MOCK_STORIES} />
       </div>
 
+      <TransmissionBreak message="— INTERCEPTED TRANSMISSIONS —" color="cyan" />
+
+      {/* 4. Live feeds */}
+      <div className="mx-auto max-w-[1440px] px-4 py-12">
+        <LiveFeedGrid />
+      </div>
+
       <TransmissionBreak message="— SITUATION ROOM —" color="amber" />
 
-      {/* 4. Manifesto */}
+      {/* 5. Manifesto */}
       <ManifestoBlock />
 
       <TransmissionBreak message="— JOIN THE NETWORK —" color="red" />
