@@ -26,10 +26,8 @@ export function LiveFeedGrid() {
       .catch(() => setLoading(false));
   }, []);
 
-  const filteredFeeds =
-    filter === "all" ? feeds : feeds.filter((f) => f.category === filter);
-
-  const focusedFeed   = filteredFeeds.find((f) => f.id === focusedId) ?? filteredFeeds[0];
+  const filteredFeeds  = filter === "all" ? feeds : feeds.filter((f) => f.category === filter);
+  const focusedFeed    = filteredFeeds.find((f) => f.id === focusedId) ?? filteredFeeds[0];
   const sidePanelFeeds = filteredFeeds.filter((f) => f.id !== focusedFeed?.id);
 
   if (loading) {
@@ -49,28 +47,27 @@ export function LiveFeedGrid() {
   return (
     <SectionFrame label="INTERCEPTED TRANSMISSIONS">
       {/* Filter bar */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <div className="mb-4 flex flex-wrap items-center gap-1.5 sm:gap-2">
         <button
           onClick={() => { setFilter("all"); setFocusedId(feeds[0]?.id ?? null); }}
           className="border px-2 py-1 font-data text-[9px] uppercase tracking-[0.1em] transition-colors duration-150"
           style={{
-            borderColor: filter === "all" ? "var(--signal-green)" : "var(--border-subtle)",
-            color:       filter === "all" ? "var(--signal-green)" : "var(--text-muted)",
+            borderColor:     filter === "all" ? "var(--signal-green)" : "var(--border-subtle)",
+            color:           filter === "all" ? "var(--signal-green)" : "var(--text-muted)",
             backgroundColor: filter === "all" ? "rgba(92,255,92,0.06)" : "transparent",
           }}
         >
           ALL ({feeds.length})
         </button>
         {CATEGORIES.map((cat) => {
-          const count = feeds.filter((f) => f.category === cat.id).length;
+          const count    = feeds.filter((f) => f.category === cat.id).length;
           const isActive = filter === cat.id;
           return (
             <button
               key={cat.id}
               onClick={() => {
                 setFilter(cat.id);
-                const first = feeds.find((f) => f.category === cat.id);
-                setFocusedId(first?.id ?? null);
+                setFocusedId(feeds.find((f) => f.category === cat.id)?.id ?? null);
               }}
               className="border px-2 py-1 font-data text-[9px] uppercase tracking-[0.1em] transition-colors duration-150"
               style={{
@@ -85,29 +82,66 @@ export function LiveFeedGrid() {
         })}
       </div>
 
-      {/* Grid: large primary + side panel */}
-      <div className="grid gap-3 lg:grid-cols-12">
-        {focusedFeed && (
+      {/* Primary feed — full width on mobile, 8/12 on desktop */}
+      {focusedFeed && (
+        <div className="grid gap-3 lg:grid-cols-12">
           <motion.div layout className="lg:col-span-8" transition={{ duration: 0.3 }}>
-            <LiveFeedWindow feed={focusedFeed} isFocused onFocus={() => setFocusedId(focusedFeed.id)} />
+            <LiveFeedWindow
+              feed={focusedFeed}
+              isFocused
+              onFocus={() => setFocusedId(focusedFeed.id)}
+            />
           </motion.div>
-        )}
 
-        <div className="flex flex-col gap-3 lg:col-span-4">
-          {sidePanelFeeds.slice(0, 3).map((feed) => (
-            <motion.div key={feed.id} layout transition={{ duration: 0.3 }}>
-              <LiveFeedWindow feed={feed} isFocused={false} onFocus={() => setFocusedId(feed.id)} />
-            </motion.div>
+          {/* Side panel — hidden on mobile, visible on lg+ */}
+          <div className="hidden flex-col gap-3 lg:col-span-4 lg:flex">
+            {sidePanelFeeds.slice(0, 3).map((feed) => (
+              <motion.div key={feed.id} layout transition={{ duration: 0.3 }}>
+                <LiveFeedWindow
+                  feed={feed}
+                  isFocused={false}
+                  onFocus={() => setFocusedId(feed.id)}
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile: horizontal scroll row of other feeds to tap */}
+      {sidePanelFeeds.length > 0 && (
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:hidden">
+          {sidePanelFeeds.map((feed) => (
+            <button
+              key={feed.id}
+              onClick={() => setFocusedId(feed.id)}
+              className="shrink-0 border px-3 py-1.5 font-data text-[9px] uppercase tracking-[0.1em] transition-all duration-150"
+              style={{
+                borderColor:     "var(--border-subtle)",
+                color:           "var(--text-muted)",
+                backgroundColor: "var(--bg-panel)",
+              }}
+            >
+              <span
+                className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: feed.accentColor }}
+              />
+              {feed.label}
+            </button>
           ))}
         </div>
-      </div>
+      )}
 
-      {/* Overflow feeds */}
+      {/* Desktop overflow grid — extra feeds below the main layout */}
       {sidePanelFeeds.length > 3 && (
-        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-3 hidden gap-3 sm:grid-cols-2 lg:grid lg:grid-cols-3">
           {sidePanelFeeds.slice(3).map((feed) => (
             <motion.div key={feed.id} layout transition={{ duration: 0.3 }}>
-              <LiveFeedWindow feed={feed} isFocused={false} onFocus={() => setFocusedId(feed.id)} />
+              <LiveFeedWindow
+                feed={feed}
+                isFocused={false}
+                onFocus={() => setFocusedId(feed.id)}
+              />
             </motion.div>
           ))}
         </div>

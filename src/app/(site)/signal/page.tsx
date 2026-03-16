@@ -15,7 +15,7 @@ export default function SignalPage() {
           <div className="flex items-end justify-between">
             <div>
               <h1
-                className="font-broadcast text-5xl leading-none tracking-[0.08em]"
+                className="font-broadcast text-3xl leading-none tracking-[0.08em] sm:text-5xl"
                 style={{ color: "var(--text-primary)" }}
               >
                 SIGNAL <span style={{ color: "var(--signal-cyan)" }}>ROOM</span>

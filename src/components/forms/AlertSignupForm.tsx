@@ -5,14 +5,14 @@ import { Radio } from "lucide-react";
 import { SignalDot } from "@/components/ui/SignalDot";
 
 export function AlertSignupForm() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail]   = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
     setStatus("loading");
-    // TODO: wire to /api/alerts or Resend in Phase 4
+    // TODO: wire to /api/alerts + Resend in Phase 4
     await new Promise((r) => setTimeout(r, 800));
     setStatus("success");
     setEmail("");
@@ -20,17 +20,17 @@ export function AlertSignupForm() {
 
   return (
     <div
-      className="w-full border p-5"
+      className="w-full border p-4 sm:p-5"
       style={{
-        borderColor: "var(--signal-red)",
+        borderColor:     "var(--signal-red)",
         backgroundColor: "rgba(255,43,43,0.04)",
-        borderRadius: "var(--radius-md)",
+        borderRadius:    "var(--radius-md)",
       }}
     >
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-3 flex items-center gap-2">
         <SignalDot color="red" pulse />
         <span
-          className="font-broadcast text-lg tracking-[0.1em]"
+          className="font-broadcast text-base tracking-[0.1em] sm:text-lg"
           style={{ color: "var(--text-primary)" }}
         >
           JOIN THE ALERT FEED
@@ -46,10 +46,10 @@ export function AlertSignupForm() {
 
       {status === "success" ? (
         <div
-          className="flex items-center gap-2 border px-3 py-2.5 font-data text-xs tracking-[0.1em]"
+          className="flex items-center gap-2 border px-3 py-2.5 font-data text-[11px] tracking-[0.1em]"
           style={{
-            borderColor: "var(--signal-green)",
-            color: "var(--signal-green)",
+            borderColor:     "var(--signal-green)",
+            color:           "var(--signal-green)",
             backgroundColor: "rgba(92,255,92,0.06)",
           }}
         >
@@ -57,29 +57,29 @@ export function AlertSignupForm() {
           SIGNAL RECEIVED — TRANSMISSION INCOMING
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="flex gap-2">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="YOUR EMAIL"
             required
-            className="flex-1 border bg-transparent px-3 py-2 font-data text-[11px] uppercase tracking-[0.08em] placeholder:text-[var(--text-muted)] focus:outline-none"
+            className="w-full flex-1 border bg-transparent px-3 py-2.5 font-data text-[11px] uppercase tracking-[0.08em] placeholder:text-[var(--text-muted)] focus:outline-none"
             style={{
-              borderColor: "var(--border-default)",
-              color: "var(--text-primary)",
+              borderColor:  "var(--border-default)",
+              color:        "var(--text-primary)",
               borderRadius: "var(--radius-sm)",
             }}
           />
           <button
             type="submit"
             disabled={status === "loading"}
-            className="flex items-center gap-1.5 border px-4 py-2 font-data text-[11px] uppercase tracking-[0.1em] transition-all duration-150 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-1.5 border px-4 py-2.5 font-data text-[11px] uppercase tracking-[0.1em] transition-all duration-150 disabled:opacity-50 sm:w-auto"
             style={{
-              borderColor: "var(--signal-red)",
-              color: "var(--signal-red)",
+              borderColor:     "var(--signal-red)",
+              color:           "var(--signal-red)",
               backgroundColor: "rgba(255,43,43,0.08)",
-              borderRadius: "var(--radius-sm)",
+              borderRadius:    "var(--radius-sm)",
             }}
           >
             <Radio size={11} />

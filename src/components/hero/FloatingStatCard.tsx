@@ -33,6 +33,8 @@ export function FloatingStatCard({
       ? "var(--signal-red)"
       : "var(--text-muted)";
 
+  const changeSign = change !== undefined && change > 0 ? "+" : "";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -41,16 +43,18 @@ export function FloatingStatCard({
       className="panel flex flex-col gap-0.5 px-3 py-2"
       style={{
         borderLeft: `2px solid ${borderColor}`,
-        minWidth: 110,
+        // fill available space in grid, min on flex row
+        minWidth: 0,
+        flex: "1 1 100px",
       }}
     >
-      <span className="font-data text-[9px] uppercase tracking-[0.12em] text-[var(--text-muted)]">
+      <span className="font-data text-[9px] uppercase tracking-[0.12em] text-[var(--text-muted)] truncate">
         {label}
       </span>
-      <span className="font-data text-sm tabular-nums text-[var(--text-primary)]">{value}</span>
+      <span className="font-data text-sm tabular-nums text-[var(--text-primary)] truncate">{value}</span>
       {change !== undefined && (
         <span className="font-data text-[10px] tabular-nums" style={{ color: changeColor }}>
-          {change > 0 ? "+" : ""}{change.toFixed(2)}%
+          {changeSign}{change.toFixed(2)}%
         </span>
       )}
     </motion.div>

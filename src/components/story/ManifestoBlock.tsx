@@ -6,7 +6,7 @@ import { CornerMarkers } from "@/components/ui/CornerMarkers";
 export function ManifestoBlock() {
   return (
     <section
-      className="relative w-full overflow-hidden py-16"
+      className="relative w-full overflow-hidden py-10 lg:py-16"
       style={{ borderTop: "1px solid var(--border-subtle)" }}
     >
       {/* Background accent */}
@@ -55,7 +55,7 @@ export function ManifestoBlock() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: 0.1 }}
-              className="grid gap-4 md:grid-cols-3"
+              className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
             >
               {[
                 "Markets are narrative warfare. Every price move has a story. Every story has a sponsor.",

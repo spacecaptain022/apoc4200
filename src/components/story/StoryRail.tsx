@@ -65,7 +65,7 @@ export function StoryRail({ stories }: StoryRailProps) {
 
         {/* Bottom row */}
         {secondary.slice(2).map((story, i) => (
-          <div key={story.slug} className="md:col-span-4">
+          <div key={story.slug} className="md:col-span-6 lg:col-span-4">
             <StoryCard story={story} variant="secondary" delay={0.1 * (i + 1)} />
           </div>
         ))}

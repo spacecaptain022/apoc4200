@@ -35,9 +35,9 @@ export function TopStatusBar() {
         </div>
 
         {/* Right: market state + timestamp */}
-        <div className="flex items-center gap-3 text-[var(--text-muted)]">
+        <div className="flex items-center gap-2 text-[var(--text-muted)] sm:gap-3">
           <span className="hidden text-[var(--signal-amber)] sm:inline">MARKETS OPEN</span>
-          <span className="text-[var(--border-strong)]">|</span>
+          <span className="hidden text-[var(--border-strong)] sm:inline">|</span>
           <Timestamp showDate={false} />
         </div>
       </div>

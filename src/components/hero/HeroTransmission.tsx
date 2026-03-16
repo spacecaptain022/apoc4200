@@ -48,16 +48,18 @@ function useLiveStatCards() {
 
 export function HeroTransmission() {
   const statCards = useLiveStatCards();
+
   return (
     <section
       className="relative w-full overflow-hidden"
       style={{
         borderBottom: "1px solid var(--border-default)",
         backgroundColor: "var(--bg-base)",
-        minHeight: "calc(100vh - 84px)",
+        // dvh respects mobile browser chrome; fallback to vh
+        minHeight: "calc(100dvh - 84px)",
       }}
     >
-      {/* Background grid overlay */}
+      {/* Background grid */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
@@ -68,16 +70,15 @@ export function HeroTransmission() {
         }}
       />
 
-      <div className="relative mx-auto max-w-[1440px] px-4 py-16">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
+      <div className="relative mx-auto max-w-[1440px] px-4 py-8 lg:py-16">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
 
-          {/* Left column — editorial */}
-          <div className="flex flex-col justify-center gap-6 lg:col-span-7">
+          {/* Left — editorial */}
+          <div className="flex flex-col justify-center gap-5 lg:col-span-7 lg:gap-6">
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="flex items-center gap-3"
             >
               <LiveBadge label="EMERGENCY BROADCAST" color="red" />
             </motion.div>
@@ -88,7 +89,8 @@ export function HeroTransmission() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="font-broadcast leading-[0.9] tracking-[0.06em]"
               style={{
-                fontSize: "clamp(56px, 8vw, 112px)",
+                // More controlled clamp — 44px mobile floor, 112px desktop ceiling
+                fontSize: "clamp(44px, 9vw, 112px)",
                 color: "var(--text-primary)",
               }}
             >
@@ -101,7 +103,7 @@ export function HeroTransmission() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
-              className="font-data max-w-xl text-sm leading-relaxed"
+              className="font-data max-w-xl text-xs leading-relaxed sm:text-sm"
               style={{ color: "var(--text-secondary)" }}
             >
               Real-time narratives, market war zones, and live degen telemetry.
@@ -119,7 +121,7 @@ export function HeroTransmission() {
             >
               <Link
                 href="/news"
-                className="flex items-center gap-2 border px-5 py-2.5 font-data text-[11px] tracking-[0.12em] uppercase transition-all duration-150"
+                className="flex items-center gap-2 border px-4 py-2.5 font-data text-[11px] tracking-[0.12em] uppercase transition-all duration-150 sm:px-5"
                 style={{
                   borderColor: "var(--signal-green)",
                   color: "var(--signal-green)",
@@ -131,7 +133,7 @@ export function HeroTransmission() {
               </Link>
               <Link
                 href="/alerts"
-                className="flex items-center gap-2 border px-5 py-2.5 font-data text-[11px] tracking-[0.12em] uppercase transition-all duration-150"
+                className="flex items-center gap-2 border px-4 py-2.5 font-data text-[11px] tracking-[0.12em] uppercase transition-all duration-150 sm:px-5"
                 style={{
                   borderColor: "var(--border-default)",
                   color: "var(--text-secondary)",
@@ -142,12 +144,12 @@ export function HeroTransmission() {
               </Link>
             </motion.div>
 
-            {/* Stat cards row */}
+            {/* Stat cards — 2-col on mobile, wrap on larger */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
-              className="flex flex-wrap gap-2 pt-2"
+              className="grid grid-cols-2 gap-2 pt-1 sm:flex sm:flex-wrap"
             >
               {statCards.map((card, i) => (
                 <FloatingStatCard key={card.label} {...card} delay={0.5 + i * 0.08} />
@@ -155,7 +157,7 @@ export function HeroTransmission() {
             </motion.div>
           </div>
 
-          {/* Right column — rotating signal window */}
+          {/* Right — rotating signal window */}
           <div className="lg:col-span-5">
             <RotatingSignalWindow />
           </div>
