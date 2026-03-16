@@ -1,13 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight, Radio } from "lucide-react";
 import { LiveBadge } from "./LiveBadge";
 import { RotatingSignalWindow } from "./RotatingSignalWindow";
 import { FloatingStatCard } from "./FloatingStatCard";
+import { ChartModal } from "@/components/market/ChartModal";
 import { useMarketStore } from "@/store/market-store";
 import { formatPrice } from "@/lib/formatting/prices";
+import { getTVSymbol, type ChartAsset } from "@/lib/chart-symbols";
 
 function useLiveStatCards() {
   const crypto = useMarketStore((s) => s.crypto);
@@ -60,10 +63,21 @@ function useLiveStatCards() {
   ];
 }
 
+const ACCENT_COLORS: Record<string, string> = {
+  "BTC / USD": "var(--signal-amber)",
+  "SOL / USD": "var(--signal-cyan)",
+  "ZEC / USD": "#a78bfa",
+  "SPY":       "var(--signal-green)",
+  "VIX":       "var(--signal-red)",
+  "NVDA":      "var(--signal-green)",
+};
+
 export function HeroTransmission() {
   const statCards = useLiveStatCards();
+  const [selectedAsset, setSelectedAsset] = useState<ChartAsset | null>(null);
 
   return (
+    <>
     <section
       className="relative w-full overflow-hidden"
       style={{
@@ -166,7 +180,20 @@ export function HeroTransmission() {
               className="grid grid-cols-3 gap-2 pt-1 sm:grid-cols-3 lg:flex lg:flex-wrap"
             >
               {statCards.map((card, i) => (
-                <FloatingStatCard key={card.label} {...card} delay={0.5 + i * 0.08} />
+                <FloatingStatCard
+                  key={card.label}
+                  {...card}
+                  delay={0.5 + i * 0.08}
+                  onClick={() =>
+                    setSelectedAsset({
+                      label:       card.label,
+                      value:       card.value,
+                      change:      card.change,
+                      tvSymbol:    getTVSymbol(card.label),
+                      accentColor: ACCENT_COLORS[card.label] ?? "var(--signal-green)",
+                    })
+                  }
+                />
               ))}
             </motion.div>
           </div>
@@ -178,5 +205,8 @@ export function HeroTransmission() {
         </div>
       </div>
     </section>
+
+    <ChartModal asset={selectedAsset} onClose={() => setSelectedAsset(null)} />
+    </>
   );
 }
