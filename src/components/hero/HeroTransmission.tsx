@@ -11,6 +11,7 @@ import { ChartModal } from "@/components/market/ChartModal";
 import { useMarketStore } from "@/store/market-store";
 import { formatPrice } from "@/lib/formatting/prices";
 import { getTVSymbol, type ChartAsset } from "@/lib/chart-symbols";
+import { useReaderCount } from "@/lib/hooks/useReaderCount";
 
 function useLiveStatCards() {
   const crypto = useMarketStore((s) => s.crypto);
@@ -73,7 +74,8 @@ const ACCENT_COLORS: Record<string, string> = {
 };
 
 export function HeroTransmission() {
-  const statCards = useLiveStatCards();
+  const statCards   = useLiveStatCards();
+  const readerCount = useReaderCount();
   const [selectedAsset, setSelectedAsset] = useState<ChartAsset | null>(null);
 
   return (
@@ -170,6 +172,24 @@ export function HeroTransmission() {
                 <Radio size={12} />
                 JOIN ALERTS
               </Link>
+
+              {/* Reader count */}
+              {readerCount !== null && (
+                <motion.span
+                  key={readerCount}
+                  initial={{ opacity: 0.6 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex items-center gap-1.5 font-data text-[10px] uppercase tracking-[0.1em]"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  <span
+                    className="blink inline-block h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: "var(--signal-green)" }}
+                  />
+                  {readerCount} OPERATIVES MONITORING
+                </motion.span>
+              )}
             </motion.div>
 
             {/* Stat cards — 2-col on mobile, wrap on larger */}

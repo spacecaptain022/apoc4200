@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { BroadcastShell } from "@/components/layout/BroadcastShell";
 import { NarrativeTag } from "@/components/story/NarrativeTag";
 import { SectionFrame } from "@/components/layout/SectionFrame";
+import { ArticleReactions } from "@/components/ui/ArticleReactions";
+import { NewSignalsToast } from "@/components/ui/NewSignalsToast";
 import type { NewsArticle, NewsCategory } from "@/app/api/news/route";
 
 const CATEGORIES: { id: NewsCategory | "ALL"; label: string; color: string }[] = [
@@ -95,7 +97,7 @@ function NewsCard({ article, featured }: { article: NewsArticle; featured?: bool
             </p>
           )}
 
-          <div className="mt-auto pt-2">
+          <div className="mt-auto flex items-center justify-between pt-2">
             <span
               className="font-data text-[9px] tracking-[0.1em] uppercase transition-colors duration-150 group-hover:text-[var(--signal-green)]"
               style={{ color: "var(--text-muted)" }}
@@ -103,6 +105,7 @@ function NewsCard({ article, featured }: { article: NewsArticle; featured?: bool
               READ FULL STORY →
             </span>
           </div>
+          <ArticleReactions articleId={article.id} />
         </div>
       </div>
     </a>
@@ -110,18 +113,31 @@ function NewsCard({ article, featured }: { article: NewsArticle; featured?: bool
 }
 
 export default function NewsPage() {
-  const [articles, setArticles] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [articles, setArticles]       = useState<NewsArticle[]>([]);
+  const [loading, setLoading]         = useState(true);
   const [activeCategory, setActiveCategory] = useState<NewsCategory | "ALL">("ALL");
-  const [fetchedAt, setFetchedAt] = useState<number | null>(null);
+  const [fetchedAt, setFetchedAt]     = useState<number | null>(null);
+  const [newCount, setNewCount]       = useState(0);
+  const knownIdsRef                   = useRef<Set<string>>(new Set());
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (isRefresh = false) => {
     try {
       const res = await fetch("/api/news");
       if (!res.ok) return;
       const data = await res.json();
-      setArticles(data.articles ?? []);
-      setFetchedAt(data.fetchedAt ?? Date.now());
+      const incoming: NewsArticle[] = data.articles ?? [];
+
+      if (isRefresh || knownIdsRef.current.size === 0) {
+        // Initial load or manual refresh — show everything, reset counter
+        setArticles(incoming);
+        setFetchedAt(data.fetchedAt ?? Date.now());
+        setNewCount(0);
+        knownIdsRef.current = new Set(incoming.map((a) => a.id));
+      } else {
+        // Background poll — count articles we haven't seen
+        const fresh = incoming.filter((a) => !knownIdsRef.current.has(a.id));
+        if (fresh.length > 0) setNewCount(fresh.length);
+      }
     } catch {
       // keep existing
     } finally {
@@ -129,9 +145,15 @@ export default function NewsPage() {
     }
   }, []);
 
+  const handleRefresh = useCallback(() => {
+    setNewCount(0);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    load(true);
+  }, [load]);
+
   useEffect(() => {
-    load();
-    const id = setInterval(load, 5 * 60_000);
+    load(true);
+    const id = setInterval(() => load(false), 2 * 60_000); // poll every 2 min
     return () => clearInterval(id);
   }, [load]);
 
@@ -144,6 +166,7 @@ export default function NewsPage() {
 
   return (
     <BroadcastShell>
+      <NewSignalsToast count={newCount} onRefresh={handleRefresh} />
       <div className="mx-auto max-w-[1440px] px-4 py-10">
         {/* Header */}
         <div

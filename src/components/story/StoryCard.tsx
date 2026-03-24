@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { NarrativeTag } from "./NarrativeTag";
 import { CornerMarkers } from "@/components/ui/CornerMarkers";
+import { ArticleReactions } from "@/components/ui/ArticleReactions";
 
 export type StoryCardData = {
   title: string;
@@ -120,6 +121,7 @@ export function StoryCard({ story, variant = "secondary", delay = 0 }: StoryCard
                   {story.dek}
                 </p>
               )}
+              <ArticleReactions articleId={story.slug} />
             </div>
           </div>
         </CornerMarkers>
