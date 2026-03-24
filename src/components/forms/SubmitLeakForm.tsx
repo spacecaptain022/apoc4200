@@ -254,7 +254,12 @@ export function SubmitLeakForm() {
           onBlur={(e)  => (e.currentTarget.style.borderColor = "var(--border-default)")}
         />
         <div className="mt-1 flex justify-between">
-          <span className="font-data text-[9px]" style={{ color: "var(--text-muted)" }}>MIN 20 CHARS</span>
+          <span
+            className="font-data text-[9px]"
+            style={{ color: message.length > 0 && message.length < 20 ? "var(--signal-red)" : "var(--text-muted)" }}
+          >
+            {message.length < 20 ? `${20 - message.length} MORE CHARS NEEDED` : "✓ MIN MET"}
+          </span>
           <span className="font-data text-[9px]" style={{ color: "var(--text-muted)" }}>{message.length} / 5000</span>
         </div>
       </div>
@@ -423,11 +428,14 @@ export function SubmitLeakForm() {
         disabled={status === "loading" || message.length < 20}
         className="flex items-center justify-center gap-2 border px-6 py-4 font-broadcast text-base tracking-[0.14em] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40"
         style={{ borderColor: "var(--signal-amber)", color: "var(--signal-amber)", backgroundColor: "rgba(255,176,0,0.06)", borderRadius: "var(--radius-md)" }}
-        onMouseEnter={(e) => { if (status !== "loading") e.currentTarget.style.backgroundColor = "rgba(255,176,0,0.14)"; }}
+        onMouseEnter={(e) => { if (status !== "loading" && message.length >= 20) e.currentTarget.style.backgroundColor = "rgba(255,176,0,0.14)"; }}
         onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(255,176,0,0.06)"; }}
+        title={message.length < 20 ? `${20 - message.length} more characters needed in the message field` : undefined}
       >
         {status === "loading" ? (
           <><Radio size={14} className="animate-spin" /> TRANSMITTING...</>
+        ) : message.length < 20 ? (
+          <><Send size={14} /> TRANSMIT LEAK — NEED {20 - message.length} MORE CHARS</>
         ) : (
           <><Send size={14} /> TRANSMIT LEAK{photos.length > 0 ? ` + ${photos.length} FILE${photos.length > 1 ? "S" : ""}` : ""}</>
         )}
