@@ -12,9 +12,14 @@ export type DexPair = {
   quoteToken:  { address: string; name: string; symbol: string };
   priceNative: string;
   priceUsd:    string;
-  txns:        { h24?: { buys: number; sells: number } };
-  volume:      { h24?: number; h6?: number; h1?: number };
-  priceChange: { h1?: number; h6?: number; h24?: number };
+  txns:        {
+    m5?:  { buys: number; sells: number };
+    h1?:  { buys: number; sells: number };
+    h6?:  { buys: number; sells: number };
+    h24?: { buys: number; sells: number };
+  };
+  volume:      { m5?: number; h1?: number; h6?: number; h24?: number };
+  priceChange: { m5?: number; h1?: number; h6?: number; h24?: number };
   liquidity?:  { usd?: number };
   fdv?:        number;
   marketCap?:  number;
@@ -31,7 +36,7 @@ type TokenProfile = {
 // In-process cache
 const cache = new Map<string, { data: DexPair[]; ts: number }>();
 const profileCache = new Map<string, string>(); // address → imageUrl
-const TTL = 30_000;
+const TTL = 10_000;
 
 // ── Logo resolution ────────────────────────────────────────────────────────
 
@@ -169,14 +174,50 @@ async function fetchTrending(): Promise<DexPair[]> {
 
 // ── Handler ────────────────────────────────────────────────────────────────
 
+const encoder = new TextEncoder();
+
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
 
-  try {
-    const pairs = q ? await fetchPairs(q) : await fetchTrending();
-    return NextResponse.json({ pairs, ts: Date.now() });
-  } catch (err) {
-    console.error("[dex route]", err);
-    return NextResponse.json({ error: "DEX data unavailable" }, { status: 502 });
+  // Search — regular JSON response
+  if (q) {
+    try {
+      const pairs = await fetchPairs(q);
+      return NextResponse.json({ pairs, ts: Date.now() });
+    } catch (err) {
+      console.error("[dex route]", err);
+      return NextResponse.json({ error: "DEX data unavailable" }, { status: 502 });
+    }
   }
+
+  // Trending — SSE stream
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = async () => {
+        try {
+          const pairs = await fetchTrending();
+          const data = JSON.stringify({ pairs, ts: Date.now() });
+          controller.enqueue(encoder.encode(`data: ${data}\n\n`));
+        } catch {
+          // silently skip failed push
+        }
+      };
+
+      await send();
+      const interval = setInterval(send, 10_000);
+
+      req.signal.addEventListener("abort", () => {
+        clearInterval(interval);
+        try { controller.close(); } catch {}
+      });
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type":  "text/event-stream",
+      "Cache-Control": "no-cache",
+      "Connection":    "keep-alive",
+    },
+  });
 }
