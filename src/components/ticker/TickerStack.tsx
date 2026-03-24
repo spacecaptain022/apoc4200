@@ -6,15 +6,39 @@ import { formatPrice, formatChange } from "@/lib/formatting/prices";
 import { TickerBand } from "./TickerBand";
 import { TickerItem } from "./TickerItem";
 import type { MarketAsset } from "@/app/api/markets/crypto/route";
+import { useState, useEffect } from "react";
+import type { NewsArticle } from "@/app/api/news/route";
 
-const HEADLINES = [
-  "FED HOLDS RATES STEADY AS INFLATION TICKS UP",
-  "INSTITUTIONAL BITCOIN ACCUMULATION ACCELERATES",
-  "TREASURY YIELDS SURGE TO MULTI-YEAR HIGHS",
-  "TECH SECTOR ROTATION ACCELERATES",
-  "CONSUMER SENTIMENT HITS 6-MONTH LOW",
-  "CHINA MARKETS REBOUND AFTER STIMULUS SIGNALS",
+const FALLBACK_HEADLINES = [
+  "LIVE NEWS FEED LOADING — STAND BY",
+  "MARKETS OPEN — MONITORING ALL CHANNELS",
+  "SIGNAL ACQUIRED — SCANNING GLOBAL FEEDS",
 ];
+
+function useNewsHeadlines() {
+  const [headlines, setHeadlines] = useState<string[]>(FALLBACK_HEADLINES);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const res = await fetch("/api/news");
+        if (!res.ok) return;
+        const data = await res.json();
+        const titles: string[] = (data.articles as NewsArticle[])
+          .slice(0, 20)
+          .map((a) => a.title);
+        if (titles.length > 0) setHeadlines(titles);
+      } catch {
+        // keep fallback
+      }
+    }
+    load();
+    const id = setInterval(load, 5 * 60_000); // refresh every 5 min
+    return () => clearInterval(id);
+  }, []);
+
+  return headlines;
+}
 
 // Fallback items shown before first fetch completes
 const CRYPTO_FALLBACK: MarketAsset[] = [
@@ -56,6 +80,7 @@ function getSignalItems(stocks: MarketAsset[]) {
 export function TickerStack() {
   // Start polling
   useMarketData({ cryptoInterval: 30_000, stocksInterval: 60_000 });
+  const headlines = useNewsHeadlines();
 
   const crypto = useMarketStore((s) => s.crypto);
   const stocks = useMarketStore((s) => s.stocks);
@@ -97,9 +122,9 @@ export function TickerStack() {
         ))}
       </TickerBand>
 
-      {/* Band 3: Headlines — static, left */}
-      <TickerBand label="FEED" labelColor="var(--signal-red)" speed={55} direction="left">
-        {HEADLINES.map((text, i) => (
+      {/* Band 3: Live headlines */}
+      <TickerBand label="LIVE" labelColor="var(--signal-red)" speed={55} direction="left">
+        {headlines.map((text, i) => (
           <span
             key={i}
             className="inline-flex items-center gap-3 px-4 font-data text-[11px] whitespace-nowrap"

@@ -9,6 +9,8 @@ export type StoryCardData = {
   title: string;
   dek?: string;
   slug: string;
+  url?: string; // external link — if set, overrides /news/:slug
+  source?: string;
   category: string;
   urgency?: "breaking" | "developing" | "analysis" | "default";
   publishedAt: string;
@@ -31,7 +33,12 @@ export function StoryCard({ story, variant = "secondary", delay = 0 }: StoryCard
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.35, delay }}
     >
-      <Link href={`/news/${story.slug}`} className="group block">
+      <Link
+        href={story.url ?? `/news/${story.slug}`}
+        target={story.url ? "_blank" : undefined}
+        rel={story.url ? "noopener noreferrer" : undefined}
+        className="group block"
+      >
         <CornerMarkers color="var(--border-default)">
           <div
             className="transition-colors duration-200"
@@ -82,7 +89,7 @@ export function StoryCard({ story, variant = "secondary", delay = 0 }: StoryCard
 
             {/* Content */}
             <div className="flex flex-col gap-2 p-3">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <NarrativeTag label={story.category} urgency={story.urgency} />
                 <span
                   className="font-data text-[9px] tabular-nums"
@@ -90,6 +97,14 @@ export function StoryCard({ story, variant = "secondary", delay = 0 }: StoryCard
                 >
                   {story.publishedAt}
                 </span>
+                {story.source && (
+                  <span
+                    className="font-data text-[9px] tracking-[0.08em] uppercase"
+                    style={{ color: "var(--text-muted)", opacity: 0.6 }}
+                  >
+                    · {story.source}
+                  </span>
+                )}
               </div>
               <h3
                 className={`font-broadcast leading-tight tracking-[0.04em] transition-colors duration-150 group-hover:text-[var(--signal-green)] ${isLead ? "text-2xl" : "text-base"}`}
