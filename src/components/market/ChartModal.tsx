@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { CornerMarkers } from "@/components/ui/CornerMarkers";
@@ -21,9 +21,31 @@ const INTERVALS = [
   { label: "1M",  tv: "M" },
 ];
 
+function buildSrcdoc(tvSymbol: string, interval: string): string {
+  const config = JSON.stringify({
+    autosize:          true,
+    symbol:            tvSymbol,
+    interval:          interval,
+    timezone:          "exchange",
+    theme:             "dark",
+    style:             "1",
+    locale:            "en",
+    toolbar_bg:        "#0a0a0a",
+    enable_publishing: false,
+    hide_top_toolbar:  false,
+    hide_legend:       false,
+    save_image:        false,
+    withdateranges:    true,
+    container_id:      "tv_chart",
+  });
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>*{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;background:#0a0a0a;overflow:hidden}</style></head><body><div id="tv_chart" style="height:100%;width:100%"></div><script src="https://s3.tradingview.com/tv.js"><\/script><script>new TradingView.widget(${config});<\/script></body></html>`;
+}
+
 export function ChartModal({ asset, onClose }: ChartModalProps) {
-  const iframeRef  = useRef<HTMLIFrameElement>(null);
-  const intervalRef = useRef("D");
+  const [interval, setInterval] = useState("D");
+
+  // Reset interval when asset changes
+  useEffect(() => { setInterval("D"); }, [asset?.tvSymbol]);
 
   // Close on Escape
   useEffect(() => {
@@ -41,21 +63,6 @@ export function ChartModal({ asset, onClose }: ChartModalProps) {
     }
     return () => { document.body.style.overflow = ""; };
   }, [asset]);
-
-  const buildEmbedUrl = (tvSymbol: string, interval: string) =>
-    `https://s.tradingview.com/widgetembed/` +
-    `?symbol=${encodeURIComponent(tvSymbol)}` +
-    `&interval=${interval}` +
-    `&hidesidetoolbar=0` +
-    `&hidetoptoolbar=0` +
-    `&saveimage=0` +
-    `&theme=dark` +
-    `&style=1` +
-    `&timezone=exchange` +
-    `&withdateranges=1` +
-    `&toolbarbg=0a0a0a` +
-    `&studies=[]` +
-    `&locale=en`;
 
   const changeColor =
     !asset?.change
@@ -154,17 +161,12 @@ export function ChartModal({ asset, onClose }: ChartModalProps) {
                       {INTERVALS.map((iv) => (
                         <button
                           key={iv.tv}
-                          onClick={() => {
-                            intervalRef.current = iv.tv;
-                            if (iframeRef.current) {
-                              iframeRef.current.src = buildEmbedUrl(asset.tvSymbol, iv.tv);
-                            }
-                          }}
+                          onClick={() => setInterval(iv.tv)}
                           className="border px-2 py-0.5 font-data text-[9px] uppercase tracking-[0.1em] transition-all duration-150"
                           style={{
-                            borderColor:     "var(--border-subtle)",
-                            color:           "var(--text-muted)",
-                            backgroundColor: "transparent",
+                            borderColor:     interval === iv.tv ? asset.accentColor : "var(--border-subtle)",
+                            color:           interval === iv.tv ? asset.accentColor : "var(--text-muted)",
+                            backgroundColor: interval === iv.tv ? `color-mix(in srgb, ${asset.accentColor} 10%, transparent)` : "transparent",
                           }}
                         >
                           {iv.label}
@@ -197,17 +199,12 @@ export function ChartModal({ asset, onClose }: ChartModalProps) {
                   {INTERVALS.map((iv) => (
                     <button
                       key={iv.tv}
-                      onClick={() => {
-                        intervalRef.current = iv.tv;
-                        if (iframeRef.current) {
-                          iframeRef.current.src = buildEmbedUrl(asset.tvSymbol, iv.tv);
-                        }
-                      }}
+                      onClick={() => setInterval(iv.tv)}
                       className="border px-2.5 py-1 font-data text-[9px] uppercase tracking-[0.1em] transition-all duration-150"
                       style={{
-                        borderColor:     "var(--border-subtle)",
-                        color:           "var(--text-muted)",
-                        backgroundColor: "transparent",
+                        borderColor:     interval === iv.tv ? asset.accentColor : "var(--border-subtle)",
+                        color:           interval === iv.tv ? asset.accentColor : "var(--text-muted)",
+                        backgroundColor: interval === iv.tv ? `color-mix(in srgb, ${asset.accentColor} 10%, transparent)` : "transparent",
                       }}
                     >
                       {iv.label}
@@ -218,8 +215,8 @@ export function ChartModal({ asset, onClose }: ChartModalProps) {
                 {/* TradingView chart iframe */}
                 <div className="relative min-h-0 flex-1">
                   <iframe
-                    ref={iframeRef}
-                    src={buildEmbedUrl(asset.tvSymbol, "D")}
+                    key={`${asset.tvSymbol}-${interval}`}
+                    srcDoc={buildSrcdoc(asset.tvSymbol, interval)}
                     className="h-full w-full"
                     style={{ border: "none", display: "block" }}
                     title={`${asset.label} chart`}

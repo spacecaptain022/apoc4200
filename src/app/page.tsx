@@ -1,41 +1,12 @@
 import { BroadcastShell } from "@/components/layout/BroadcastShell";
 import { HeroTransmission } from "@/components/hero/HeroTransmission";
 import { TickerStack } from "@/components/ticker/TickerStack";
-import { StoryRail, MOCK_STORIES } from "@/components/story/StoryRail";
 import { ManifestoBlock } from "@/components/story/ManifestoBlock";
 import { TransmissionBreak } from "@/components/media/TransmissionBreak";
 import { LiveFeedGrid } from "@/components/media/LiveFeedGrid";
 import { AlertSignupForm } from "@/components/forms/AlertSignupForm";
-import type { StoryCardData } from "@/components/story/StoryCard";
-import type { NewsArticle } from "@/app/api/news/route";
-
-async function getLiveStories(): Promise<StoryCardData[]> {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/api/news`, {
-      next: { revalidate: 300 },
-    });
-    if (!res.ok) return MOCK_STORIES;
-    const data = await res.json();
-    const articles: NewsArticle[] = data.articles ?? [];
-    return articles.slice(0, 8).map((a) => ({
-      title: a.title,
-      dek: a.description?.slice(0, 180) || undefined,
-      slug: a.id,
-      url: a.url,
-      source: a.source,
-      category: a.category,
-      urgency: a.urgency,
-      publishedAt: a.publishedAt,
-      mediaUrl: a.mediaUrl,
-    }));
-  } catch {
-    return MOCK_STORIES;
-  }
-}
 
 export default async function HomePage() {
-  const stories = await getLiveStories();
-
   return (
     <BroadcastShell>
       {/* 1. Hero */}
@@ -43,11 +14,6 @@ export default async function HomePage() {
 
       {/* 2. Ticker stack */}
       <TickerStack />
-
-      {/* 3. Lead stories */}
-      <div className="mx-auto max-w-[1440px] px-4 py-12">
-        <StoryRail stories={stories} />
-      </div>
 
       <TransmissionBreak message="— INTERCEPTED TRANSMISSIONS —" color="cyan" />
 
