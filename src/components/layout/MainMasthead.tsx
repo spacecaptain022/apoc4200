@@ -41,7 +41,7 @@ export function MainMasthead() {
               className="font-broadcast text-xl tracking-[0.14em]"
               style={{ color: "var(--text-primary)" }}
             >
-              APOC<span style={{ color: "var(--signal-green)" }}>4200</span>
+              News<span style={{ color: "var(--signal-green)" }}>Coin</span>
             </span>
           </Link>
 

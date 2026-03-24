@@ -38,7 +38,7 @@ export function TerminalFooter() {
               className="font-broadcast text-base tracking-[0.14em]"
               style={{ color: "var(--text-secondary)" }}
             >
-              APOC<span style={{ color: "var(--signal-green)" }}>4200</span>
+              News<span style={{ color: "var(--signal-green)" }}>Coin</span>
             </span>
           </div>
 
