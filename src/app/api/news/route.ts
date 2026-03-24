@@ -23,25 +23,34 @@ type RSSSource = {
 };
 
 const RSS_SOURCES: RSSSource[] = [
-  { url: "https://feeds.bbci.co.uk/news/world/rss.xml",           source: "BBC NEWS",     defaultCategory: "GLOBAL"      },
-  { url: "https://feeds.bbci.co.uk/news/business/rss.xml",        source: "BBC NEWS",     defaultCategory: "MARKETS"     },
-  { url: "https://feeds.bbci.co.uk/news/technology/rss.xml",      source: "BBC NEWS",     defaultCategory: "GLOBAL"      },
-  { url: "https://www.aljazeera.com/xml/rss/all.xml",             source: "AL JAZEERA",  defaultCategory: "GEOPOLITICS" },
-  { url: "https://www.cnbc.com/id/100003114/device/rss/rss.html", source: "CNBC",        defaultCategory: "MARKETS"     },
-  { url: "https://www.cnbc.com/id/10000664/device/rss/rss.html",  source: "CNBC",        defaultCategory: "MARKETS"     },
-  { url: "https://www.theguardian.com/world/rss",                  source: "THE GUARDIAN", defaultCategory: "GLOBAL"     },
-  { url: "https://www.theguardian.com/business/rss",               source: "THE GUARDIAN", defaultCategory: "MARKETS"    },
-  { url: "https://feeds.skynews.com/feeds/rss/world.xml",          source: "SKY NEWS",    defaultCategory: "GLOBAL"      },
-  { url: "https://feeds.skynews.com/feeds/rss/business.xml",       source: "SKY NEWS",    defaultCategory: "MARKETS"     },
-  { url: "https://www.coindesk.com/arc/outboundfeeds/rss/",        source: "COINDESK",    defaultCategory: "CRYPTO"      },
-  { url: "https://decrypt.co/feed",                                source: "DECRYPT",     defaultCategory: "CRYPTO"      },
-  { url: "https://cointelegraph.com/rss",                          source: "COINTELEGRAPH", defaultCategory: "CRYPTO"    },
-  { url: "https://feeds.npr.org/1001/rss.xml",                     source: "NPR",         defaultCategory: "MACRO"       },
-  { url: "https://feeds.reuters.com/reuters/topNews",              source: "REUTERS",     defaultCategory: "GLOBAL"      },
-  { url: "https://feeds.reuters.com/reuters/businessNews",         source: "REUTERS",     defaultCategory: "MARKETS"     },
-  { url: "https://rss.dw.com/rdf/rss-en-world",                    source: "DW NEWS",     defaultCategory: "GEOPOLITICS" },
-  { url: "https://www.france24.com/en/rss",                        source: "FRANCE 24",   defaultCategory: "GEOPOLITICS" },
-  { url: "https://feeds.feedburner.com/breitbart",                 source: "BREITBART",   defaultCategory: "GLOBAL"      },
+  // ── CRYPTO — edgy / investigative ───────────────────────────────────────
+  { url: "https://rekt.news/feed/",                                    source: "REKT NEWS",      defaultCategory: "CRYPTO"      },
+  { url: "https://www.theblock.co/rss.xml",                            source: "THE BLOCK",      defaultCategory: "CRYPTO"      },
+  { url: "https://protos.com/feed/",                                   source: "PROTOS",         defaultCategory: "CRYPTO"      },
+  { url: "https://bitcoinmagazine.com/.rss/full",                      source: "BITCOIN MAG",    defaultCategory: "CRYPTO"      },
+  { url: "https://cryptoslate.com/feed/",                              source: "CRYPTOSLATE",    defaultCategory: "CRYPTO"      },
+  { url: "https://watcher.guru/news/feed",                             source: "WATCHER GURU",   defaultCategory: "CRYPTO"      },
+  { url: "https://www.milkroad.com/feed",                              source: "MILK ROAD",      defaultCategory: "CRYPTO"      },
+  { url: "https://dirtybubble.substack.com/feed",                      source: "DIRTY BUBBLE",   defaultCategory: "CRYPTO"      },
+  { url: "https://www.coindesk.com/arc/outboundfeeds/rss/",            source: "COINDESK",       defaultCategory: "CRYPTO"      },
+  { url: "https://decrypt.co/feed",                                    source: "DECRYPT",        defaultCategory: "CRYPTO"      },
+  { url: "https://cointelegraph.com/rss",                              source: "COINTELEGRAPH",  defaultCategory: "CRYPTO"      },
+
+  // ── MARKETS — counter-narrative ──────────────────────────────────────────
+  { url: "https://feeds.feedburner.com/zerohedge/feed",                source: "ZEROHEDGE",      defaultCategory: "MARKETS"     },
+  { url: "https://thekobeissiletter.substack.com/feed",                source: "KOBEISSI",       defaultCategory: "MARKETS"     },
+  { url: "https://www.cnbc.com/id/100003114/device/rss/rss.html",      source: "CNBC",           defaultCategory: "MARKETS"     },
+  { url: "https://www.cnbc.com/id/10000664/device/rss/rss.html",       source: "CNBC",           defaultCategory: "MARKETS"     },
+  { url: "https://feeds.reuters.com/reuters/businessNews",             source: "REUTERS",        defaultCategory: "MARKETS"     },
+
+  // ── GEOPOLITICS ──────────────────────────────────────────────────────────
+  { url: "https://www.aljazeera.com/xml/rss/all.xml",                  source: "AL JAZEERA",     defaultCategory: "GEOPOLITICS" },
+  { url: "https://rss.dw.com/rdf/rss-en-world",                        source: "DW NEWS",        defaultCategory: "GEOPOLITICS" },
+  { url: "https://www.france24.com/en/rss",                            source: "FRANCE 24",      defaultCategory: "GEOPOLITICS" },
+  { url: "https://feeds.feedburner.com/breitbart",                     source: "BREITBART",      defaultCategory: "GLOBAL"      },
+
+  // ── MACRO / WIRE ─────────────────────────────────────────────────────────
+  { url: "https://feeds.reuters.com/reuters/topNews",                  source: "REUTERS",        defaultCategory: "GLOBAL"      },
 ];
 
 function extractTag(xml: string, tag: string): string {
