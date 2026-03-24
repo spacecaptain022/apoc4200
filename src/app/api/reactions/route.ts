@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export type ReactionEmoji = "🚨" | "💀" | "📈" | "🔥";
-export const EMOJIS: ReactionEmoji[] = ["🚨", "💀", "📈", "🔥"];
+export type ReactionEmoji = "💀" | "🔥";
+export const EMOJIS: ReactionEmoji[] = ["💀", "🔥"];
 
 export type ReactionCounts = Record<ReactionEmoji, number>;
 export type ReactionsMap = Record<string, ReactionCounts>;
@@ -11,7 +11,7 @@ const store = new Map<string, ReactionCounts>();
 
 function getOrInit(articleId: string): ReactionCounts {
   if (!store.has(articleId)) {
-    store.set(articleId, { "🚨": 0, "💀": 0, "📈": 0, "🔥": 0 });
+    store.set(articleId, { "💀": 0, "🔥": 0 });
   }
   return store.get(articleId)!;
 }
