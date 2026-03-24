@@ -190,6 +190,7 @@ export function HeroTransmission() {
                 <FloatingStatCard
                   key={card.label}
                   {...card}
+                  accentColor={ACCENT_COLORS[card.label] ?? "var(--signal-green)"}
                   delay={0.5 + i * 0.08}
                   onClick={() =>
                     setSelectedAsset({
@@ -215,6 +216,7 @@ export function HeroTransmission() {
                 <FloatingStatCard
                   key={card.label}
                   {...card}
+                  accentColor={ACCENT_COLORS[card.label] ?? "var(--signal-amber)"}
                   delay={0.65 + i * 0.08}
                   onClick={() =>
                     setSelectedAsset({
