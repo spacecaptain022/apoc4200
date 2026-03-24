@@ -64,16 +64,20 @@ function assetToTickerProps(a: MarketAsset) {
 // Pull out signal metrics from the stocks array
 function getSignalItems(stocks: MarketAsset[]) {
   const find = (sym: string) => stocks.find((s) => s.symbol === sym || s.symbol === sym.replace("^", ""));
-  const vix  = find("VIX");
-  const gold = find("GLD");
-  const oil  = find("USO");
-  const dow  = find("DJI");
+  const vix    = find("VIX");
+  const gold   = find("GLD");
+  const silver = find("SLV");
+  const copper = find("CPER");
+  const oil    = find("USO");
+  const dow    = find("DJI");
 
   return [
-    vix  && { label: "VIX",  value: vix.price > 0  ? formatPrice(vix.price)  : "—", change: vix.change24h },
-    gold && { label: "GOLD", value: gold.price > 0 ? formatPrice(gold.price) : "—", change: gold.change24h },
-    oil  && { label: "OIL",  value: oil.price > 0  ? formatPrice(oil.price)  : "—", change: oil.change24h },
-    dow  && { label: "DOW",  value: dow.price > 0  ? formatPrice(dow.price)  : "—", change: dow.change24h },
+    vix    && { label: "VIX",    value: vix.price > 0    ? formatPrice(vix.price)    : "—", change: vix.change24h },
+    gold   && { label: "GOLD",   value: gold.price > 0   ? formatPrice(gold.price)   : "—", change: gold.change24h },
+    silver && { label: "SILVER", value: silver.price > 0 ? formatPrice(silver.price) : "—", change: silver.change24h },
+    copper && { label: "COPPER", value: copper.price > 0 ? formatPrice(copper.price) : "—", change: copper.change24h },
+    oil    && { label: "OIL",    value: oil.price > 0    ? formatPrice(oil.price)    : "—", change: oil.change24h },
+    dow    && { label: "DOW",    value: dow.price > 0    ? formatPrice(dow.price)    : "—", change: dow.change24h },
   ].filter(Boolean) as Array<{ label: string; value: string; change: number }>;
 }
 
@@ -91,7 +95,7 @@ export function TickerStack() {
   // Filter out index symbols (VIX, GLD, USO, DJI) from the main stocks band
   const stockItems =
     stocks.length > 0
-      ? stocks.filter((s) => !["VIX", "GLD", "USO", "DJI"].includes(s.symbol))
+      ? stocks.filter((s) => !["VIX", "GLD", "SLV", "CPER", "USO", "DJI"].includes(s.symbol))
       : STOCKS_FALLBACK;
   const signalItems = getSignalItems(stocks);
 

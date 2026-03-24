@@ -9,6 +9,8 @@ export const revalidate = 60;
 const SYMBOLS = [
   "SPY", "QQQ", "NVDA", "TSLA", "AAPL", "MSFT", "META", "GOOGL",
   "GLD",   // Gold ETF
+  "SLV",   // Silver ETF
+  "CPER",  // Copper ETF
   "USO",   // Oil ETF
   "^VIX",  // Volatility index
   "^DJI",  // Dow Jones

@@ -6,6 +6,10 @@ export const TV_SYMBOL_MAP: Record<string, string> = {
   "SPY":       "AMEX:SPY",
   "VIX":       "CBOE:VIX",
   "NVDA":      "NASDAQ:NVDA",
+  "GOLD":      "COMEX:GC1!",
+  "SILVER":    "COMEX:SI1!",
+  "COPPER":    "COMEX:HG1!",
+  "OIL":       "NYMEX:CL1!",
 };
 
 export function getTVSymbol(label: string): string {

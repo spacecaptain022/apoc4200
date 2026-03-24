@@ -17,51 +17,34 @@ function useLiveStatCards() {
   const crypto = useMarketStore((s) => s.crypto);
   const stocks = useMarketStore((s) => s.stocks);
 
-  const btc  = crypto.find((c) => c.symbol === "BTC");
-  const sol  = crypto.find((c) => c.symbol === "SOL");
-  const zec  = crypto.find((c) => c.symbol === "ZEC");
-  const spy  = stocks.find((s) => s.symbol === "SPY");
-  const vix  = stocks.find((s) => s.symbol === "VIX");
-  const nvda = stocks.find((s) => s.symbol === "NVDA");
+  const btc    = crypto.find((c) => c.symbol === "BTC");
+  const sol    = crypto.find((c) => c.symbol === "SOL");
+  const zec    = crypto.find((c) => c.symbol === "ZEC");
+  const spy    = stocks.find((s) => s.symbol === "SPY");
+  const vix    = stocks.find((s) => s.symbol === "VIX");
+  const nvda   = stocks.find((s) => s.symbol === "NVDA");
+  const gold   = stocks.find((s) => s.symbol === "GLD");
+  const silver = stocks.find((s) => s.symbol === "SLV");
+  const copper = stocks.find((s) => s.symbol === "CPER");
+  const oil    = stocks.find((s) => s.symbol === "USO");
 
-  return [
-    {
-      label:  "BTC / USD",
-      value:  btc?.price ? formatPrice(btc.price) : "—",
-      change: btc?.change24h,
-      status: (btc?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const),
-    },
-    {
-      label:  "SOL / USD",
-      value:  sol?.price ? formatPrice(sol.price) : "—",
-      change: sol?.change24h,
-      status: (sol?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const),
-    },
-    {
-      label:  "ZEC / USD",
-      value:  zec?.price ? formatPrice(zec.price) : "—",
-      change: zec?.change24h,
-      status: (zec?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const),
-    },
-    {
-      label:  "SPY",
-      value:  spy?.price ? formatPrice(spy.price) : "—",
-      change: spy?.change24h,
-      status: (spy?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const),
-    },
-    {
-      label:  "VIX",
-      value:  vix?.price ? vix.price.toFixed(2) : "—",
-      change: vix?.change24h,
-      status: (vix?.price ?? 0) > 25 ? ("alert" as const) : ("sync" as const),
-    },
-    {
-      label:  "NVDA",
-      value:  nvda?.price ? formatPrice(nvda.price) : "—",
-      change: nvda?.change24h,
-      status: (nvda?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const),
-    },
+  const markets = [
+    { label: "BTC / USD", value: btc?.price  ? formatPrice(btc.price)  : "—", change: btc?.change24h,  status: (btc?.change24h  ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
+    { label: "SOL / USD", value: sol?.price  ? formatPrice(sol.price)  : "—", change: sol?.change24h,  status: (sol?.change24h  ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
+    { label: "ZEC / USD", value: zec?.price  ? formatPrice(zec.price)  : "—", change: zec?.change24h,  status: (zec?.change24h  ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
+    { label: "SPY",       value: spy?.price  ? formatPrice(spy.price)  : "—", change: spy?.change24h,  status: (spy?.change24h  ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
+    { label: "VIX",       value: vix?.price  ? vix.price.toFixed(2)   : "—", change: vix?.change24h,  status: (vix?.price      ?? 0) > 25 ? ("alert" as const) : ("sync" as const) },
+    { label: "NVDA",      value: nvda?.price ? formatPrice(nvda.price) : "—", change: nvda?.change24h, status: (nvda?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
   ];
+
+  const commodities = [
+    { label: "GOLD",   value: gold?.price   ? formatPrice(gold.price)   : "—", change: gold?.change24h,   status: (gold?.change24h   ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
+    { label: "SILVER", value: silver?.price ? formatPrice(silver.price) : "—", change: silver?.change24h, status: (silver?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
+    { label: "COPPER", value: copper?.price ? formatPrice(copper.price) : "—", change: copper?.change24h, status: (copper?.change24h ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
+    { label: "OIL",    value: oil?.price    ? formatPrice(oil.price)    : "—", change: oil?.change24h,    status: (oil?.change24h    ?? 0) < 0 ? ("alert" as const) : ("live" as const) },
+  ];
+
+  return { markets, commodities };
 }
 
 const ACCENT_COLORS: Record<string, string> = {
@@ -71,10 +54,14 @@ const ACCENT_COLORS: Record<string, string> = {
   "SPY":       "var(--signal-green)",
   "VIX":       "var(--signal-red)",
   "NVDA":      "var(--signal-green)",
+  "GOLD":      "#f5c542",
+  "SILVER":    "#c0c0c0",
+  "COPPER":    "#b87333",
+  "OIL":       "var(--signal-amber)",
 };
 
 export function HeroTransmission() {
-  const statCards   = useLiveStatCards();
+  const { markets, commodities } = useLiveStatCards();
   const readerCount = useReaderCount();
   const [selectedAsset, setSelectedAsset] = useState<ChartAsset | null>(null);
 
@@ -192,14 +179,14 @@ export function HeroTransmission() {
               )}
             </motion.div>
 
-            {/* Stat cards — 2-col on mobile, wrap on larger */}
+            {/* Market stat cards */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.5 }}
               className="grid grid-cols-3 gap-2 pt-1 sm:grid-cols-3 lg:flex lg:flex-wrap"
             >
-              {statCards.map((card, i) => (
+              {markets.map((card, i) => (
                 <FloatingStatCard
                   key={card.label}
                   {...card}
@@ -211,6 +198,31 @@ export function HeroTransmission() {
                       change:      card.change,
                       tvSymbol:    getTVSymbol(card.label),
                       accentColor: ACCENT_COLORS[card.label] ?? "var(--signal-green)",
+                    })
+                  }
+                />
+              ))}
+            </motion.div>
+
+            {/* Commodities row */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.65 }}
+              className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:flex lg:flex-wrap"
+            >
+              {commodities.map((card, i) => (
+                <FloatingStatCard
+                  key={card.label}
+                  {...card}
+                  delay={0.65 + i * 0.08}
+                  onClick={() =>
+                    setSelectedAsset({
+                      label:       card.label,
+                      value:       card.value,
+                      change:      card.change,
+                      tvSymbol:    getTVSymbol(card.label),
+                      accentColor: ACCENT_COLORS[card.label] ?? "var(--signal-amber)",
                     })
                   }
                 />
