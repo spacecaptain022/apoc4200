@@ -123,10 +123,10 @@ export function HeroTransmission() {
               className="font-data max-w-xl text-xs leading-relaxed sm:text-sm"
               style={{ color: "var(--text-secondary)" }}
             >
-              Real-time narratives, market war zones, and live degen telemetry.
+              No editors. No sponsors. No narrative management.
               <br />
               <span style={{ color: "var(--text-muted)" }}>
-                The news is theater. The signal is here.
+                Raw flow, intercepted intel, and market telemetry before the suits price it in.
               </span>
             </motion.p>
 
@@ -174,7 +174,7 @@ export function HeroTransmission() {
                     className="blink inline-block h-1.5 w-1.5 rounded-full"
                     style={{ backgroundColor: "var(--signal-green)" }}
                   />
-                  {readerCount} OPERATIVES MONITORING
+                  {readerCount} OPERATIVES IN THE ROOM
                 </motion.span>
               )}
             </motion.div>

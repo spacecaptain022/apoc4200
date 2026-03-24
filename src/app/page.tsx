@@ -1,10 +1,29 @@
 import { BroadcastShell } from "@/components/layout/BroadcastShell";
 import { HeroTransmission } from "@/components/hero/HeroTransmission";
 import { TickerStack } from "@/components/ticker/TickerStack";
+import { TickerBand } from "@/components/ticker/TickerBand";
 import { ManifestoBlock } from "@/components/story/ManifestoBlock";
 import { TransmissionBreak } from "@/components/media/TransmissionBreak";
 import { LiveFeedGrid } from "@/components/media/LiveFeedGrid";
 import { AlertSignupForm } from "@/components/forms/AlertSignupForm";
+
+const DEGEN_PHRASES = [
+  "TRUST NO ANALYST",
+  "EVERY CANDLE IS A CONFESSION",
+  "BUY THE SIGNAL NOT THE NEWS",
+  "DEGENS DON'T SLEEP",
+  "FOLLOW THE FLOW NOT THE NARRATIVE",
+  "EVERY ANALYST IS CAPTURED",
+  "THE CONSENSUS IS WHERE ALPHA DIES",
+  "NO POSITION IS A POSITION",
+  "THE CLOSE IS IRRELEVANT",
+  "NEVER TRADE THE NEWS",
+  "PRICE IS THE ONLY TRUTH",
+  "THE CHART NEVER LIES",
+  "EARLY OR WRONG — NO IN BETWEEN",
+  "THE MARKET DOESN'T CARE ABOUT YOUR THESIS",
+  "RISK IS JUST INFORMATION YOU DON'T HAVE YET",
+];
 
 export default async function HomePage() {
   return (
@@ -12,22 +31,34 @@ export default async function HomePage() {
       {/* 1. Hero */}
       <HeroTransmission />
 
+      {/* Degen doctrine tape */}
+      <TickerBand label="DOCTRINE" labelColor="var(--signal-red)" speed={55} direction="left" borderTop borderBottom>
+        {DEGEN_PHRASES.map((phrase, i) => (
+          <span key={i} className="flex items-center">
+            <span className="mx-5 font-data text-[10px] uppercase tracking-[0.14em]" style={{ color: "var(--text-muted)" }}>
+              {phrase}
+            </span>
+            <span className="opacity-20" style={{ color: "var(--signal-red)" }}>◆</span>
+          </span>
+        ))}
+      </TickerBand>
+
       {/* 2. Ticker stack */}
       <TickerStack />
 
-      <TransmissionBreak message="— INTERCEPTED TRANSMISSIONS —" color="cyan" />
+      <TransmissionBreak message="— EYES ON THE TAPE —" color="cyan" />
 
       {/* 4. Live feeds */}
       <div className="mx-auto max-w-[1440px] px-4 py-12">
         <LiveFeedGrid />
       </div>
 
-      <TransmissionBreak message="— SITUATION ROOM —" color="amber" />
+      <TransmissionBreak message="— SITUATION ROOM — EYES ONLY —" color="amber" />
 
       {/* 5. Manifesto */}
       <ManifestoBlock />
 
-      <TransmissionBreak message="— JOIN THE NETWORK —" color="red" />
+      <TransmissionBreak message="— BECOME AN OPERATIVE —" color="red" />
 
       {/* 5. Conversion */}
       <div
@@ -51,13 +82,14 @@ export default async function HomePage() {
                 className="font-broadcast text-lg tracking-[0.1em]"
                 style={{ color: "var(--text-primary)" }}
               >
-                SUBMIT A LEAK
+                DROP A LEAK
               </span>
               <p
                 className="font-data text-xs leading-relaxed"
                 style={{ color: "var(--text-secondary)" }}
               >
-                Got a tip, source, or intercepted transmission? Drop it here — anonymous, secure.
+                Got something the market needs to know? An insider tip, an on-chain anomaly, a leak that&apos;ll move markets?
+                <span style={{ color: "var(--text-muted)" }}> Anonymous. Zero traces. We investigate everything.</span>
               </p>
               <a
                 href="/submit"

@@ -25,7 +25,7 @@ export function ManifestoBlock() {
               className="font-data text-[10px] uppercase tracking-[0.14em]"
               style={{ color: "var(--text-muted)" }}
             >
-              TRANSMISSION SOURCE
+              DEGEN MANIFESTO
             </span>
             <div
               className="h-px w-12"
@@ -46,8 +46,10 @@ export function ManifestoBlock() {
                 color: "var(--text-primary)",
               }}
             >
-              THE SIGNAL IS NEVER{" "}
-              <span style={{ color: "var(--signal-green)" }}>NEUTRAL</span>
+              THE FEED IS{" "}
+              <span style={{ color: "var(--signal-red)" }}>COMPROMISED.</span>
+              <br />
+              <span style={{ color: "var(--signal-green)" }}>WE ARE NOT.</span>
             </motion.h2>
 
             <motion.div
@@ -58,9 +60,9 @@ export function ManifestoBlock() {
               className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
             >
               {[
-                "Markets are narrative warfare. Every price move has a story. Every story has a sponsor.",
-                "We don't repeat the feed. We intercept it. We decode the structure underneath the noise.",
-                "Anti-mainstream positioning isn't a vibe — it's a methodology. Question the consensus. Follow the flow.",
+                "Every candle is a confession. Every wick is a tell. We read price action — not press releases.",
+                "No editorial board. No sponsor calls. Built in the dark with raw data and a terminal that never closes.",
+                "The consensus is where alpha goes to die. We operate in the gap between what's happening and what they're allowed to say.",
               ].map((text, i) => (
                 <CornerMarkers key={i} color="var(--border-default)">
                   <div
