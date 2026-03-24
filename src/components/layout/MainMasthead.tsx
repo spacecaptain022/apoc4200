@@ -7,6 +7,7 @@ import { Search, Zap, Send, Menu, X } from "lucide-react";
 const NAV_LINKS = [
   { href: "/news",    label: "NEWS" },
   { href: "/markets", label: "MARKETS" },
+  { href: "/leaks",   label: "LEAKS" },
   { href: "/signal",  label: "SIGNAL" },
   { href: "/alerts",  label: "ALERTS" },
   { href: "/submit",  label: "SUBMIT" },

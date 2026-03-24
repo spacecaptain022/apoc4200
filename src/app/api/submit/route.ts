@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
+import { addLeak } from "@/lib/leaks-store";
 
 const ALLOWED_TYPES = new Set([
   "image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf",
@@ -112,5 +113,14 @@ ${message}
     }
   }
 
-  return NextResponse.json({ ok: true });
+  // ── Save to public leaks board ────────────────────────────────────────────
+  const leak = addLeak({
+    category,
+    sourceType,
+    urgency,
+    preview:     message.slice(0, 300),
+    hasEvidence: attachments.length > 0,
+  });
+
+  return NextResponse.json({ ok: true, refId: leak.refId });
 }
