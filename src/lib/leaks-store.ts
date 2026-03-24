@@ -1,15 +1,22 @@
 // In-memory leaks store — shared across API routes in the same Node.js process.
 // Leaks are kept in reverse-chronological order, capped at 200 entries.
 
+export type LeakEvidence = {
+  name: string;
+  type: string;  // MIME type
+  data: string;  // base64 encoded
+};
+
 export type LeakEntry = {
   id:          string;
   refId:       string;  // e.g. "LEAK-0042"
   category:    "CRYPTO" | "MARKETS" | "GEOPOLITICS" | "MACRO" | "OTHER";
   sourceType:  "INSIDER" | "WHISTLEBLOWER" | "MARKET_OBSERVATION" | "TECHNICAL" | "ANONYMOUS";
   urgency:     "BREAKING" | "DEVELOPING" | "ANALYSIS";
-  preview:     string;  // first 300 chars of message — no full text public
+  preview:     string;     // first 300 chars of message — no full text public
   hasEvidence: boolean;
-  receivedAt:  number;  // ms timestamp
+  evidence?:   LeakEvidence[];
+  receivedAt:  number;     // ms timestamp
 };
 
 const MAX_LEAKS = 200;

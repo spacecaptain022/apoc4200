@@ -152,6 +152,37 @@ function LeakCard({ leak }: { leak: LeakEntry }) {
         <RedactedText text={leak.preview} />
       </div>
 
+      {/* Evidence images */}
+      {leak.evidence && leak.evidence.length > 0 && (
+        <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(leak.evidence.length, 3)}, 1fr)` }}>
+          {leak.evidence.map((ev, i) => (
+            <a
+              key={i}
+              href={`data:${ev.type};base64,${ev.data}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative overflow-hidden block"
+              style={{ border: "1px solid var(--border-subtle)", aspectRatio: "16/9" }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`data:${ev.type};base64,${ev.data}`}
+                alt={ev.name}
+                className="h-full w-full object-cover transition-opacity duration-150 hover:opacity-80"
+              />
+              <div
+                className="absolute bottom-0 left-0 right-0 px-2 py-1"
+                style={{ background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)" }}
+              >
+                <span className="font-data text-[8px] truncate block" style={{ color: "rgba(255,255,255,0.6)" }}>
+                  {ev.name}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
       {/* Footer */}
       <div className="flex items-center justify-between pt-1">
         <ArticleReactions articleId={leak.id} />

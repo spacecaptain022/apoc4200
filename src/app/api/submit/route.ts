@@ -114,12 +114,22 @@ ${message}
   }
 
   // ── Save to public leaks board ────────────────────────────────────────────
+  const evidence = attachments
+    .filter((a) => a.contentType.startsWith("image/"))
+    .slice(0, 5)
+    .map((a) => ({
+      name: a.filename,
+      type: a.contentType,
+      data: a.content.toString("base64"),
+    }));
+
   const leak = addLeak({
     category,
     sourceType,
     urgency,
     preview:     message.slice(0, 300),
     hasEvidence: attachments.length > 0,
+    evidence:    evidence.length > 0 ? evidence : undefined,
   });
 
   return NextResponse.json({ ok: true, refId: leak.refId });
