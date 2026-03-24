@@ -18,10 +18,14 @@ export function LiveFeedWindow({ feed, isFocused = false, onFocus }: LiveFeedWin
   const [loaded, setLoaded] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Use known persistent video ID if available, otherwise fall back to channel live stream
+  const baseUrl = feed.videoId
+    ? `https://www.youtube.com/embed/${feed.videoId}`
+    : `https://www.youtube.com/embed/live_stream?channel=${feed.channelId}`;
   const embedUrl =
-    `https://www.youtube.com/embed/live_stream` +
-    `?channel=${feed.channelId}` +
-    `&autoplay=1` +
+    baseUrl +
+    (feed.videoId ? "?" : "&") +
+    `autoplay=1` +
     `&mute=${muted ? 1 : 0}` +
     `&controls=0` +
     `&modestbranding=1` +

@@ -65,7 +65,9 @@ export function RotatingSignalWindow() {
   const accentColor = currentFeed?.accentColor ?? catMeta?.color ?? "var(--signal-green)";
 
   const embedUrl = currentFeed
-    ? `https://www.youtube.com/embed/live_stream?channel=${currentFeed.channelId}&autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`
+    ? (currentFeed.videoId
+        ? `https://www.youtube.com/embed/${currentFeed.videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`
+        : `https://www.youtube.com/embed/live_stream?channel=${currentFeed.channelId}&autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`)
     : null;
 
   return (
