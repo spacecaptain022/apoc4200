@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import { Radio } from "lucide-react";
 import { LiveFeedWindow } from "./LiveFeedWindow";
@@ -8,13 +8,16 @@ import { SectionFrame } from "@/components/layout/SectionFrame";
 import { DataLabel } from "@/components/ui/DataLabel";
 import { CATEGORIES } from "@/app/api/feeds/route";
 import type { LiveFeed, FeedCategory } from "@/app/api/feeds/route";
+import type { LiveStatus } from "@/app/api/live-status/route";
 
 export function LiveFeedGrid() {
-  const [feeds, setFeeds]         = useState<LiveFeed[]>([]);
-  const [focusedId, setFocusedId] = useState<string | null>(null);
-  const [filter, setFilter]       = useState<FeedCategory | "all">("all");
-  const [loading, setLoading]     = useState(true);
+  const [feeds, setFeeds]           = useState<LiveFeed[]>([]);
+  const [statuses, setStatuses]     = useState<Record<string, string | null>>({});
+  const [focusedId, setFocusedId]   = useState<string | null>(null);
+  const [filter, setFilter]         = useState<FeedCategory | "all">("all");
+  const [loading, setLoading]       = useState(true);
 
+  // Load feed list once
   useEffect(() => {
     fetch("/api/feeds")
       .then((r) => r.json())
@@ -26,9 +29,43 @@ export function LiveFeedGrid() {
       .catch(() => setLoading(false));
   }, []);
 
+  // Poll live status every 3 min
+  const pollLiveStatus = useCallback(async () => {
+    try {
+      const r = await fetch("/api/live-status");
+      if (!r.ok) return;
+      const d = await r.json();
+      const map: Record<string, string | null> = {};
+      for (const s of (d.statuses as LiveStatus[])) {
+        map[s.feedId] = s.videoId;
+      }
+      setStatuses(map);
+    } catch {
+      // keep previous statuses
+    }
+  }, []);
+
+  useEffect(() => {
+    if (feeds.length === 0) return;
+    pollLiveStatus();
+    const id = setInterval(pollLiveStatus, 3 * 60_000);
+    return () => clearInterval(id);
+  }, [feeds.length, pollLiveStatus]);
+
+  // ── Filtering ──────────────────────────────────────────────────────────────
   const filteredFeeds  = filter === "all" ? feeds : feeds.filter((f) => f.category === filter);
-  const focusedFeed    = filteredFeeds.find((f) => f.id === focusedId) ?? filteredFeeds[0];
-  const sidePanelFeeds = filteredFeeds.filter((f) => f.id !== focusedFeed?.id);
+
+  // Prefer focused feed that actually has a live stream
+  const liveFirst = [...filteredFeeds].sort((a, b) => {
+    const aLive = statuses[a.id] != null ? 1 : 0;
+    const bLive = statuses[b.id] != null ? 1 : 0;
+    return bLive - aLive;
+  });
+
+  const focusedFeed    = liveFirst.find((f) => f.id === focusedId) ?? liveFirst[0];
+  const sidePanelFeeds = liveFirst.filter((f) => f.id !== focusedFeed?.id);
+
+  const liveCount = filteredFeeds.filter((f) => statuses[f.id] != null).length;
 
   if (loading) {
     return (
@@ -49,7 +86,7 @@ export function LiveFeedGrid() {
       {/* Filter bar */}
       <div className="mb-4 flex flex-wrap items-center gap-1.5 sm:gap-2">
         <button
-          onClick={() => { setFilter("all"); setFocusedId(feeds[0]?.id ?? null); }}
+          onClick={() => { setFilter("all"); setFocusedId(liveFirst[0]?.id ?? null); }}
           className="border px-2 py-1 font-data text-[9px] uppercase tracking-[0.1em] transition-colors duration-150"
           style={{
             borderColor:     filter === "all" ? "var(--signal-green)" : "var(--border-subtle)",
@@ -58,16 +95,24 @@ export function LiveFeedGrid() {
           }}
         >
           ALL ({feeds.length})
+          {liveCount > 0 && (
+            <span style={{ color: "var(--signal-green)", marginLeft: 4 }}>
+              · {liveCount} LIVE
+            </span>
+          )}
         </button>
+
         {CATEGORIES.map((cat) => {
-          const count    = feeds.filter((f) => f.category === cat.id).length;
+          const total   = feeds.filter((f) => f.category === cat.id).length;
+          const live    = feeds.filter((f) => f.category === cat.id && statuses[f.id] != null).length;
           const isActive = filter === cat.id;
           return (
             <button
               key={cat.id}
               onClick={() => {
                 setFilter(cat.id);
-                setFocusedId(feeds.find((f) => f.category === cat.id)?.id ?? null);
+                const first = liveFirst.find((f) => f.category === cat.id);
+                setFocusedId(first?.id ?? null);
               }}
               className="border px-2 py-1 font-data text-[9px] uppercase tracking-[0.1em] transition-colors duration-150"
               style={{
@@ -76,29 +121,30 @@ export function LiveFeedGrid() {
                 backgroundColor: isActive ? `${cat.color}10` : "transparent",
               }}
             >
-              {cat.label} ({count})
+              {cat.label} {live > 0 ? `${live}/${total}` : total}
             </button>
           );
         })}
       </div>
 
-      {/* Primary feed — full width on mobile, 8/12 on desktop */}
+      {/* Primary feed */}
       {focusedFeed && (
         <div className="grid gap-3 lg:grid-cols-12">
           <motion.div layout className="lg:col-span-8" transition={{ duration: 0.3 }}>
             <LiveFeedWindow
               feed={focusedFeed}
+              resolvedVideoId={statuses[focusedFeed.id] ?? null}
               isFocused
               onFocus={() => setFocusedId(focusedFeed.id)}
             />
           </motion.div>
 
-          {/* Side panel — hidden on mobile, visible on lg+ */}
           <div className="hidden flex-col gap-3 lg:col-span-4 lg:flex">
             {sidePanelFeeds.slice(0, 3).map((feed) => (
               <motion.div key={feed.id} layout transition={{ duration: 0.3 }}>
                 <LiveFeedWindow
                   feed={feed}
+                  resolvedVideoId={statuses[feed.id] ?? null}
                   isFocused={false}
                   onFocus={() => setFocusedId(feed.id)}
                 />
@@ -108,37 +154,41 @@ export function LiveFeedGrid() {
         </div>
       )}
 
-      {/* Mobile: horizontal scroll row of other feeds to tap */}
+      {/* Mobile scroll row */}
       {sidePanelFeeds.length > 0 && (
         <div className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-          {sidePanelFeeds.map((feed) => (
-            <button
-              key={feed.id}
-              onClick={() => setFocusedId(feed.id)}
-              className="shrink-0 border px-3 py-1.5 font-data text-[9px] uppercase tracking-[0.1em] transition-all duration-150"
-              style={{
-                borderColor:     "var(--border-subtle)",
-                color:           "var(--text-muted)",
-                backgroundColor: "var(--bg-panel)",
-              }}
-            >
-              <span
-                className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full"
-                style={{ backgroundColor: feed.accentColor }}
-              />
-              {feed.label}
-            </button>
-          ))}
+          {sidePanelFeeds.map((feed) => {
+            const isLive = statuses[feed.id] != null;
+            return (
+              <button
+                key={feed.id}
+                onClick={() => setFocusedId(feed.id)}
+                className="shrink-0 border px-3 py-1.5 font-data text-[9px] uppercase tracking-[0.1em] transition-all duration-150"
+                style={{
+                  borderColor:     isLive ? feed.accentColor : "var(--border-subtle)",
+                  color:           isLive ? "var(--text-secondary)" : "var(--text-muted)",
+                  backgroundColor: "var(--bg-panel)",
+                }}
+              >
+                <span
+                  className={`mr-1.5 inline-block h-1.5 w-1.5 rounded-full ${isLive ? "blink" : ""}`}
+                  style={{ backgroundColor: isLive ? feed.accentColor : "var(--border-default)" }}
+                />
+                {feed.label}
+              </button>
+            );
+          })}
         </div>
       )}
 
-      {/* Desktop overflow grid — extra feeds below the main layout */}
+      {/* Desktop overflow grid */}
       {sidePanelFeeds.length > 3 && (
         <div className="mt-3 hidden gap-3 sm:grid-cols-2 lg:grid lg:grid-cols-3">
           {sidePanelFeeds.slice(3).map((feed) => (
             <motion.div key={feed.id} layout transition={{ duration: 0.3 }}>
               <LiveFeedWindow
                 feed={feed}
+                resolvedVideoId={statuses[feed.id] ?? null}
                 isFocused={false}
                 onFocus={() => setFocusedId(feed.id)}
               />

@@ -6,6 +6,7 @@ import { CornerMarkers } from "@/components/ui/CornerMarkers";
 import { DataLabel } from "@/components/ui/DataLabel";
 import { Timestamp } from "@/components/ui/Timestamp";
 import { FEEDS, CATEGORIES, type LiveFeed, type FeedCategory } from "@/app/api/feeds/route";
+import type { LiveStatus } from "@/app/api/live-status/route";
 
 const CYCLE_MS = 6000;
 
@@ -14,8 +15,21 @@ export function RotatingSignalWindow() {
   const [feedIndex, setFeedIndex]           = useState(0);
   const [switching, setSwitching]           = useState(false);
   const [progress, setProgress]             = useState(0);
+  const [liveMap, setLiveMap]               = useState<Record<string, string | null>>({});
   const timerRef    = useRef<ReturnType<typeof setInterval> | null>(null);
   const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Fetch live status once on mount
+  useEffect(() => {
+    fetch("/api/live-status")
+      .then((r) => r.json())
+      .then((d) => {
+        const map: Record<string, string | null> = {};
+        for (const s of (d.statuses as LiveStatus[])) map[s.feedId] = s.videoId;
+        setLiveMap(map);
+      })
+      .catch(() => {});
+  }, []);
 
   const feedsForCategory = FEEDS.filter((f) => f.category === activeCategory);
   const currentFeed: LiveFeed | undefined = feedsForCategory[feedIndex];
@@ -64,9 +78,13 @@ export function RotatingSignalWindow() {
   const catMeta     = CATEGORIES.find((c) => c.id === activeCategory);
   const accentColor = currentFeed?.accentColor ?? catMeta?.color ?? "var(--signal-green)";
 
+  const activeVideoId = currentFeed
+    ? (liveMap[currentFeed.id] ?? currentFeed.videoId ?? null)
+    : null;
+
   const embedUrl = currentFeed
-    ? (currentFeed.videoId
-        ? `https://www.youtube.com/embed/${currentFeed.videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`
+    ? (activeVideoId
+        ? `https://www.youtube.com/embed/${activeVideoId}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`
         : `https://www.youtube.com/embed/live_stream?channel=${currentFeed.channelId}&autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`)
     : null;
 

@@ -9,30 +9,23 @@ import type { LiveFeed } from "@/app/api/feeds/route";
 
 type LiveFeedWindowProps = {
   feed: LiveFeed;
+  resolvedVideoId?: string | null; // dynamically resolved by /api/live-status
   isFocused?: boolean;
   onFocus?: () => void;
 };
 
-export function LiveFeedWindow({ feed, isFocused = false, onFocus }: LiveFeedWindowProps) {
+export function LiveFeedWindow({ feed, resolvedVideoId, isFocused = false, onFocus }: LiveFeedWindowProps) {
   const [muted, setMuted] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Use known persistent video ID if available, otherwise fall back to channel live stream
-  const baseUrl = feed.videoId
-    ? `https://www.youtube.com/embed/${feed.videoId}`
-    : `https://www.youtube.com/embed/live_stream?channel=${feed.channelId}`;
-  const embedUrl =
-    baseUrl +
-    (feed.videoId ? "?" : "&") +
-    `autoplay=1` +
-    `&mute=${muted ? 1 : 0}` +
-    `&controls=0` +
-    `&modestbranding=1` +
-    `&rel=0` +
-    `&iv_load_policy=3` +
-    `&disablekb=1` +
-    `&fs=0`;
+  // Priority: dynamically resolved ID > static videoId > channel live_stream (last resort)
+  const activeVideoId = resolvedVideoId ?? feed.videoId ?? null;
+  const isOffline = resolvedVideoId === null && feed.videoId == null;
+
+  const embedUrl = activeVideoId
+    ? `https://www.youtube.com/embed/${activeVideoId}?autoplay=1&mute=${muted ? 1 : 0}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`
+    : `https://www.youtube.com/embed/live_stream?channel=${feed.channelId}&autoplay=1&mute=${muted ? 1 : 0}&controls=0&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`;
 
   // When toggling mute we need to reload the iframe with new mute param
   const handleMuteToggle = (e: React.MouseEvent) => {
@@ -83,32 +76,52 @@ export function LiveFeedWindow({ feed, isFocused = false, onFocus }: LiveFeedWin
           className="relative"
           style={{ aspectRatio: "16/9", backgroundColor: "#000" }}
         >
-          {/* Loading overlay */}
-          {!loaded && (
+          {/* Offline state */}
+          {isOffline ? (
             <div
-              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2"
+              className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3"
               style={{ backgroundColor: "var(--bg-elevated)" }}
             >
-              <Radio
-                size={20}
-                className="blink"
-                style={{ color: feed.accentColor }}
+              <div
+                className="h-px w-8"
+                style={{ backgroundColor: "var(--border-strong)" }}
               />
-              <DataLabel>ACQUIRING SIGNAL</DataLabel>
+              <DataLabel>SIGNAL OFFLINE</DataLabel>
+              <div
+                className="h-px w-8"
+                style={{ backgroundColor: "var(--border-strong)" }}
+              />
             </div>
-          )}
+          ) : (
+            <>
+              {/* Loading overlay */}
+              {!loaded && (
+                <div
+                  className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2"
+                  style={{ backgroundColor: "var(--bg-elevated)" }}
+                >
+                  <Radio
+                    size={20}
+                    className="blink"
+                    style={{ color: feed.accentColor }}
+                  />
+                  <DataLabel>ACQUIRING SIGNAL</DataLabel>
+                </div>
+              )}
 
-          <iframe
-            ref={iframeRef}
-            key={`${feed.id}-${muted}`}
-            src={embedUrl}
-            className="h-full w-full"
-            allow="autoplay; encrypted-media"
-            allowFullScreen={false}
-            onLoad={() => setLoaded(true)}
-            title={feed.label}
-            style={{ border: "none", display: "block" }}
-          />
+              <iframe
+                ref={iframeRef}
+                key={`${feed.id}-${activeVideoId}-${muted}`}
+                src={embedUrl}
+                className="h-full w-full"
+                allow="autoplay; encrypted-media"
+                allowFullScreen={false}
+                onLoad={() => setLoaded(true)}
+                title={feed.label}
+                style={{ border: "none", display: "block" }}
+              />
+            </>
+          )}
 
           {/* Scanline overlay */}
           <div
