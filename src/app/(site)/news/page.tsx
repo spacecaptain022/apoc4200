@@ -29,20 +29,20 @@ function timeAgo(ms: number): string {
 
 function NewsCard({ article, featured }: { article: NewsArticle; featured?: boolean }) {
   return (
-    <a
-      href={article.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block h-full"
+    <div
+      className="h-full flex flex-col"
+      style={{
+        border: "1px solid var(--border-default)",
+        backgroundColor: "var(--bg-panel)",
+        borderRadius: "var(--radius-md)",
+        overflow: "hidden",
+      }}
     >
-      <div
-        className="h-full flex flex-col transition-colors duration-200"
-        style={{
-          border: "1px solid var(--border-default)",
-          backgroundColor: "var(--bg-panel)",
-          borderRadius: "var(--radius-md)",
-          overflow: "hidden",
-        }}
+      <a
+        href={article.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group flex flex-col flex-1"
       >
         {/* Media */}
         {article.mediaUrl && (
@@ -105,10 +105,14 @@ function NewsCard({ article, featured }: { article: NewsArticle; featured?: bool
               READ FULL STORY →
             </span>
           </div>
-          <ArticleReactions articleId={article.id} />
         </div>
+      </a>
+
+      {/* Reactions — outside the <a> so clicks don't navigate */}
+      <div className="px-3 pb-3">
+        <ArticleReactions articleId={article.id} />
       </div>
-    </a>
+    </div>
   );
 }
 

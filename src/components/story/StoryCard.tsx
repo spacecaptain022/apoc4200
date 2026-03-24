@@ -34,21 +34,20 @@ export function StoryCard({ story, variant = "secondary", delay = 0 }: StoryCard
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.35, delay }}
     >
-      <Link
-        href={story.url ?? `/news/${story.slug}`}
-        target={story.url ? "_blank" : undefined}
-        rel={story.url ? "noopener noreferrer" : undefined}
-        className="group block"
-      >
-        <CornerMarkers color="var(--border-default)">
-          <div
-            className="transition-colors duration-200"
-            style={{
-              border: "1px solid var(--border-default)",
-              backgroundColor: "var(--bg-panel)",
-              borderRadius: "var(--radius-md)",
-              overflow: "hidden",
-            }}
+      <CornerMarkers color="var(--border-default)">
+        <div
+          style={{
+            border: "1px solid var(--border-default)",
+            backgroundColor: "var(--bg-panel)",
+            borderRadius: "var(--radius-md)",
+            overflow: "hidden",
+          }}
+        >
+          <Link
+            href={story.url ?? `/news/${story.slug}`}
+            target={story.url ? "_blank" : undefined}
+            rel={story.url ? "noopener noreferrer" : undefined}
+            className="group block"
           >
             {/* Media area */}
             <div
@@ -78,7 +77,6 @@ export function StoryCard({ story, variant = "secondary", delay = 0 }: StoryCard
                   </span>
                 </div>
               )}
-              {/* Scanline on media */}
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{
@@ -92,17 +90,11 @@ export function StoryCard({ story, variant = "secondary", delay = 0 }: StoryCard
             <div className="flex flex-col gap-2 p-3">
               <div className="flex items-center gap-2 flex-wrap">
                 <NarrativeTag label={story.category} urgency={story.urgency} />
-                <span
-                  className="font-data text-[9px] tabular-nums"
-                  style={{ color: "var(--text-muted)" }}
-                >
+                <span className="font-data text-[9px] tabular-nums" style={{ color: "var(--text-muted)" }}>
                   {story.publishedAt}
                 </span>
                 {story.source && (
-                  <span
-                    className="font-data text-[9px] tracking-[0.08em] uppercase"
-                    style={{ color: "var(--text-muted)", opacity: 0.6 }}
-                  >
+                  <span className="font-data text-[9px] tracking-[0.08em] uppercase" style={{ color: "var(--text-muted)", opacity: 0.6 }}>
                     · {story.source}
                   </span>
                 )}
@@ -114,18 +106,19 @@ export function StoryCard({ story, variant = "secondary", delay = 0 }: StoryCard
                 {story.title}
               </h3>
               {story.dek && isLead && (
-                <p
-                  className="font-data text-xs leading-relaxed"
-                  style={{ color: "var(--text-secondary)" }}
-                >
+                <p className="font-data text-xs leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   {story.dek}
                 </p>
               )}
-              <ArticleReactions articleId={story.slug} />
             </div>
+          </Link>
+
+          {/* Reactions — outside the Link so clicks don't navigate */}
+          <div className="px-3 pb-3">
+            <ArticleReactions articleId={story.slug} />
           </div>
-        </CornerMarkers>
-      </Link>
+        </div>
+      </CornerMarkers>
     </motion.div>
   );
 }
