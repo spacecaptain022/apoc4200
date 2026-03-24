@@ -34,11 +34,24 @@ function getMarketStatus(): { label: string; open: boolean } {
 }
 
 export function TopStatusBar() {
-  const [market, setMarket] = useState<{ label: string; open: boolean }>({ label: "MARKETS CLOSED", open: false });
+  const [market, setMarket]   = useState<{ label: string; open: boolean }>({ label: "MARKETS CLOSED", open: false });
+  const [msgIdx, setMsgIdx]   = useState(0);
+  const [msgVisible, setMsgVisible] = useState(true);
 
   useEffect(() => {
     setMarket(getMarketStatus());
-    const id = setInterval(() => setMarket(getMarketStatus()), 60_000);
+    const mktId = setInterval(() => setMarket(getMarketStatus()), 60_000);
+    return () => clearInterval(mktId);
+  }, []);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setMsgVisible(false);
+      setTimeout(() => {
+        setMsgIdx((i) => (i + 1) % ROTATING_MESSAGES.length);
+        setMsgVisible(true);
+      }, 200);
+    }, 4000);
     return () => clearInterval(id);
   }, []);
 
@@ -59,8 +72,11 @@ export function TopStatusBar() {
         </div>
 
         {/* Center: rotating message */}
-        <div className="hidden text-[var(--text-muted)] tracking-[0.1em] sm:block">
-          {ROTATING_MESSAGES[0]}
+        <div
+          className="hidden tracking-[0.1em] sm:block transition-opacity duration-200"
+          style={{ color: "var(--text-muted)", opacity: msgVisible ? 1 : 0 }}
+        >
+          {ROTATING_MESSAGES[msgIdx]}
         </div>
 
         {/* Right: market state + timestamp */}

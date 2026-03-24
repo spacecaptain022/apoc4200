@@ -1,9 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { ArrowRight, Radio } from "lucide-react";
+
+const SYSTEM_ALERTS = [
+  "▶ [SOLANA] UNUSUAL VOLUME SPIKE · +847% · 14 BUYS IN 3MIN",
+  "▶ [LEAK] TRANSMISSION RECEIVED · CLASSIFICATION: LEVEL 4 · ANALYZING...",
+  "▶ [MARKETS] DARK POOL ACTIVITY DETECTED · TICKER: $SPY · SIZE: LARGE",
+  "▶ [WHALE] 8,400 BTC TRANSFERRED · DESTINATION: UNKNOWN · FLAGGED",
+  "▶ [SIGNAL] NARRATIVE SHIFT DETECTED · SECTOR: CRYPTO · MOMENTUM: BULL",
+  "▶ [BREACH] INSIDER TIP RECEIVED · CATEGORY: MARKETS · VERIFYING...",
+  "▶ [CHAIN] SMART CONTRACT ANOMALY · ETH MAINNET · HIGH PRIORITY",
+  "▶ [MACRO] FED LEAK DETECTED · MINUTES NOT YET RELEASED · WATCH",
+  "▶ [ALERT] COORDINATED SELL PRESSURE · PAIR: BTC/USD · 3 EXCHANGES",
+];
+
+function SystemAlertFeed() {
+  const [idx, setIdx]         = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIdx((i) => (i + 1) % SYSTEM_ALERTS.length);
+        setVisible(true);
+      }, 250);
+    }, 3200);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div
+      className="flex items-center gap-2 font-data text-[10px] uppercase tracking-[0.1em] transition-opacity duration-200"
+      style={{ color: "var(--signal-amber)", opacity: visible ? 1 : 0 }}
+    >
+      <span className="blink h-1 w-1 shrink-0 rounded-full" style={{ backgroundColor: "var(--signal-amber)" }} />
+      {SYSTEM_ALERTS[idx]}
+    </div>
+  );
+}
 import { LiveBadge } from "./LiveBadge";
 import { RotatingSignalWindow } from "./RotatingSignalWindow";
 import { FloatingStatCard } from "./FloatingStatCard";
@@ -81,9 +119,16 @@ export function HeroTransmission() {
         className="pointer-events-none absolute inset-0"
         style={{
           backgroundImage:
-            "linear-gradient(var(--border-subtle) 1px, transparent 1px), linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px)",
+            "linear-gradient(var(--border-default) 1px, transparent 1px), linear-gradient(90deg, var(--border-default) 1px, transparent 1px)",
           backgroundSize: "40px 40px",
-          opacity: 0.3,
+          opacity: 0.5,
+        }}
+      />
+      {/* Radial fade over grid */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: "radial-gradient(ellipse at 60% 40%, transparent 30%, var(--bg-base) 80%)",
         }}
       />
 
@@ -106,15 +151,23 @@ export function HeroTransmission() {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="font-broadcast leading-[0.9] tracking-[0.06em]"
               style={{
-                // More controlled clamp — 44px mobile floor, 112px desktop ceiling
                 fontSize: "clamp(44px, 9vw, 112px)",
                 color: "var(--text-primary)",
               }}
             >
               SIGNAL
               <br />
-              <span style={{ color: "var(--signal-green)" }}>ACQUIRED</span>
+              <span className="glitch" style={{ color: "var(--signal-green)" }}>ACQUIRED</span>
             </motion.h1>
+
+            {/* Live system alert feed */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.18 }}
+            >
+              <SystemAlertFeed />
+            </motion.div>
 
             <motion.p
               initial={{ opacity: 0, y: 8 }}

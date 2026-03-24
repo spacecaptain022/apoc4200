@@ -47,7 +47,7 @@ export function ManifestoBlock() {
               }}
             >
               THE FEED IS{" "}
-              <span style={{ color: "var(--signal-red)" }}>COMPROMISED.</span>
+              <span className="glitch-slow" style={{ color: "var(--signal-red)" }}>COMPROMISED.</span>
               <br />
               <span style={{ color: "var(--signal-green)" }}>WE ARE NOT.</span>
             </motion.h2>
